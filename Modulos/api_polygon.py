@@ -11,7 +11,7 @@ def polygon(symbol:str):
     while attempts < max_attempts:
         
         date = get_last_weekday(current_date)
-        url = f"{os.getenv("URL_POLYGON")}{symbol}/{date}"
+        url = os.getenv("URL_POLYGON")+f"{symbol}/{date}"
         headers = {"Authorization": f"Bearer "+str(os.getenv("TOKEN_API"))}
         response = requests.get(url, headers=headers)
         if response.status_code == 200:
@@ -20,4 +20,4 @@ def polygon(symbol:str):
         else:
             current_date = current_date - timedelta(days=1)
             attempts += 1
-    raise HTTPException(status_code=response.status_code, detail="Error fetching stock data")
+    raise HTTPException(status_code=404, detail="Error fetching stock data")

@@ -1,0 +1,26 @@
+version: '3.8'
+
+services:
+  postgres_db:
+    image: postgres:latest
+    environment:
+      POSTGRES_DB: stock_db
+      POSTGRES_USER: myuser
+      POSTGRES_PASSWORD: mypassword
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./docker-entrypoint-initdb.d:/docker-entrypoint-initdb.d
+
+  fastapi_app:
+    build: .
+    depends_on:
+      - postgres_db
+    environment:
+      DATABASE_URL: postgres://myuser:mypassword@postgres_db/stock_db
+    ports:
+      - "8000:8000"
+    volumes:
+      - .:/app
+
+volumes:
+  postgres_data:

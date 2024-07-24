@@ -6,13 +6,13 @@ from datetime import datetime, timedelta
 from .prep_values import *
 
 
-    # Função para calcular o desempenho
+
 def calculate_performance(start_date:str, end_date:str,symbol:str):
-    # Obter dados históricos
+    
     ticker = yf.Ticker(symbol)
 
     data = ticker.history(start=start_date, end=end_date)
-    # Calcular a performance
+    
     if not data.empty:
         start_price = data.iloc[0]['Close']
         end_price = data.iloc[-1]['Close']
@@ -22,36 +22,30 @@ def calculate_performance(start_date:str, end_date:str,symbol:str):
 
 def extract_alternative(symbol:str):
 
-    # URL da página com a lista de concorrentes
+    
     try:
         url = os.getenv("URL_MARKETBEAT_NASDAQ").replace("{symbol}",symbol)
 
-        # Fazer a requisição para o site
         response = requests.get(url)
         soup = BeautifulSoup(response.text, 'html.parser')
 
-        # Encontrar a tabela com os concorrentes
+        
         table = soup.find('table', {'id': 'competitors-table'})    
-        titulo = soup.find('h1', {'id':'pageTitle'}).text.replace("\n","").replace(" Competitors","")
-            # Verificar se a tabela foi encontrada
+        title = soup.find('h1', {'id':'pageTitle'}).text.replace("\n","").replace(" Competitors","")
+        
         if not table:
-            raise Exception("Tabela de competidores não encontrada na página.")           
+            raise Exception("Competitors table not found on the page.")           
     except:
         url = os.getenv("URL_MARKETBEAT_NYSE").replace("{symbol}",symbol)
 
-        # Fazer a requisição para o site
         response = requests.get(url)
         soup = BeautifulSoup(response.text, 'html.parser')
 
-        # Encontrar a tabela com os concorrentes
         table = soup.find('table', {'id': 'competitors-table'})
-        titulo = soup.find('h1', {'id':'pageTitle'}).text.replace("\n","").replace(" Competitors","")    
+        title = soup.find('h1', {'id':'pageTitle'}).text.replace("\n","").replace(" Competitors","")    
 
-        
-
-    # Extrair os símbolos dos concorrentes
     list_competitors = []
-    for tr in table.find_all('tr')[1:]:  # Pular o cabeçalho
+    for tr in table.find_all('tr')[1:]: 
         td = tr.find_all('td')
         if len(td) > 0:
             value = regex_value_format(td[5].text.strip())
@@ -63,10 +57,8 @@ def extract_alternative(symbol:str):
                 }
             })
 
-    # Data de hoje
     today = datetime.now()
 
-    # Calcular as datas de início para cada período
     five_days_ago = today - timedelta(days=5)
     one_month_ago = today - timedelta(days=30)
     three_months_ago = today - timedelta(days=90)
@@ -86,5 +78,7 @@ def extract_alternative(symbol:str):
     "performance_data": performance,
     "Competitors": list_competitors
     }
+
     #print(return_json)
-    return return_json,titulo
+    return return_json, title 
+
