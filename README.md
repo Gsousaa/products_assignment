@@ -56,7 +56,7 @@ If not installed, follow the instructions on the Docker Compose website.
 
 Open a terminal and clone the repository
 ```
-git clone https://github.com/your-username/your-repository.git
+git clone https://github.com/Gsousaa/products_assignment.git
 ```
 
  - Build the Docker Image:
